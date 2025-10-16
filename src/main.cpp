@@ -23,7 +23,8 @@ competition Competition;
 /*  Do them in the following function.  You must return from this function   */
 /*  or the autonomous and usercontrol tasks will not be started.  This       */
 /*  function is only called once after the V5 has been powered on and        */
-/*  not every time that the robot is disabled.                               */
+/*  define all aspects of the vex bot here 
+ */
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
@@ -44,7 +45,7 @@ void pre_auton(void) {
 
 void autonomous(void) {
   // ..........................................................................
-  // Insert autonomous user code here.
+  // add direct measurement because we dont have any sensors
   // ..........................................................................
 }
 
