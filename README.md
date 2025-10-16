@@ -5,3 +5,5 @@ Empty Competition Template for VEXV5
 - Code is put in the src folder
 
 VexcodeV5 VSCode plugin found here: https://marketplace.visualstudio.com/items?itemName=VEXRobotics.vexcode
+
+test readme update
