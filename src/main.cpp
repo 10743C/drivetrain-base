@@ -25,6 +25,12 @@ motor driveleftBack(PORT2, ratio18_1, false);
 motor driverightFront(PORT9, ratio18_1, true);
 motor driverightBack(PORT10, ratio18_1, true);
 
+//define all intake motors
+motor intakerightFront(PORT8, ratio18_1, false);
+motor intakerightMiddle(PORT7, ratio18_1, false);
+motor intakeleftMiddle(PORT3, ratio18_1, true);
+motor intakeleftBack(PORT4, ratio18_1, true);
+
 // define your global instances of motors and other devices here
 
 /*---------------------------------------------------------------------------*/
