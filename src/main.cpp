@@ -14,6 +14,11 @@ using namespace vex;
 // A global instance of competition
 competition Competition;
 
+
+brain Brain;
+controller Controller;
+
+
 // define your global instances of motors and other devices here
 
 /*---------------------------------------------------------------------------*/
