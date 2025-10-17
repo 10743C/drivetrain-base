@@ -9,15 +9,21 @@
 
 #include "vex.h"
 
-using namespace vex;
+//makes it easier to do instead of using say vex::Motor
+using namespace vex; 
 
 // A global instance of competition
 competition Competition;
 
-
+//declare the brain and controller 
 brain Brain;
 controller Controller;
 
+//define the motors
+motor driveleftFront(PORT1, ratio36_1, false)
+motor driveleftBack(PORT2, ratio36_1, false)
+motor driverightFront(PORT9, ratio36_1, false)
+motor driverightBack(PORT10, ratio36_1, false)
 
 // define your global instances of motors and other devices here
 
