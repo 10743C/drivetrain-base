@@ -19,11 +19,11 @@ competition Competition;
 brain Brain;
 controller Controller;
 
-//define the motors
-motor driveleftFront(PORT1, ratio36_1, false)
-motor driveleftBack(PORT2, ratio36_1, false)
-motor driverightFront(PORT9, ratio36_1, false)
-motor driverightBack(PORT10, ratio36_1, false)
+//define the drivetrain motors
+motor driveleftFront(PORT1, ratio18_1, false);
+motor driveleftBack(PORT2, ratio18_1, false);
+motor driverightFront(PORT9, ratio18_1, true);
+motor driverightBack(PORT10, ratio18_1, true);
 
 // define your global instances of motors and other devices here
 
