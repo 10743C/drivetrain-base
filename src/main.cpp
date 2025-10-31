@@ -53,8 +53,8 @@ void pre_auton(void) {
   driveright.setStopping(brake);
   intake.setStopping(hold);
 
-  //print to brain
-  Brain.Screen.printAt(10, 40, 'robot pre-auton complete');
+  //print to brain            
+  Brain.Screen.printAt(10, 40, "robot pre-auton complete");
 
 }
 
@@ -88,15 +88,30 @@ void autonomous(void) {
 
 void usercontrol(void) {
   // User control code here, inside the loop
-  while (1) {
-    // This is the main execution loop for the user control program.
-    // Each time through the loop your program should update motor + servo
-    // values based on feedback from the joysticks.
 
-    // ........................................................................
-    // Insert user code here. This is where you use the joystick values to
-    // update your motors, etc.
-    // ........................................................................
+
+  while (true) {
+
+    //read joystick values
+    int forward = Controller.Axis2.position(pct);
+    int turn = Controller.Axis4.position(pct);
+
+    //calculate motor powers
+    int leftPower = forward + turn;
+    int rightPower = forward - turn;
+
+    //apply to drivetrain
+    driveleft.spin(fwd, leftPower, pct);
+    driveright.spin(fwd, rightPower, pct);
+
+    //intake control from l1, r1
+    if (Controller.ButtonL1.pressing()) {
+      intake.spin(fwd, 100, pct);
+    } else if (Controller.ButtonR1.pressing()) {
+      intake.spin(reverse, 100, pct);
+    } else {
+      intake.stop();
+    }
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
