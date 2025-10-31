@@ -9,6 +9,7 @@
 
 #include "vex.h"
 
+
 //makes it easier to do instead of using say vex::Motor
 using namespace vex; 
 
@@ -57,6 +58,7 @@ void pre_auton(void) {
   Brain.Screen.printAt(10, 40, "robot pre-auton complete");
 
 }
+
 
 
 void drivePID(double targetDegrees) {
@@ -132,6 +134,7 @@ void drivePID(double targetDegrees) {
 }
 
 
+
 void autonomous(void) {
   // ..........................................................................
   // add direct measurement because we dont have any sensors
@@ -167,6 +170,22 @@ void usercontrol(void) {
     int leftPower = forward + turn;
     int rightPower = forward - turn;
 
+    //pid stabilisation + antidrift,
+    //checks encoders when going straight, then applies a small correction
+    if (fabs(turn) < 5 && fabs(forward) > 10) {
+      double error = driveleftFront.position(degrees) - driverightFront.position(degrees);
+      double kP = 0.05; //small correction
+      double correction = kP * error;
+
+      leftPower -= correction;
+      rightPower += correction;
+
+    } else {
+      //reset encoders when turning
+      driveleftFront.setPosition(0, degrees);
+      driverightFront.setPosition(0, degrees);
+    }
+
     //apply to drivetrain
     driveleft.spin(fwd, leftPower, pct);
     driveright.spin(fwd, rightPower, pct);
@@ -185,9 +204,8 @@ void usercontrol(void) {
   }
 }
 
-//
-// Main will set up the competition functions and callbacks.
-//
+
+
 int main() {
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
