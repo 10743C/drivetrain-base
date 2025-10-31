@@ -58,21 +58,88 @@ void pre_auton(void) {
 
 }
 
-/*---------------------------------------------------------------------------*/
-/*                                                                           */
-/*                              Autonomous Task                              */
-/*                                                                           */
-/*  This task is used to control your robot during the autonomous phase of   */
-/*  a VEX Competition.                                                       */
-/*                                                                           */
-/*  You must modify the code to add your own robot specific commands here.   */
-/*---------------------------------------------------------------------------*/
+
+void drivePID(double targetDegrees) {
+
+  /*
+    PID formula:
+    output = (kP * error) + (kI * integral) + (kD * derivative)
+
+    where:
+    error = distance from the goal; target - current
+    integral = sum of all past errors
+    derivative = how fast error is changing
+    output = power sent to motor
+  */
+
+  //PID constants
+  double kP = 0.5; //kP = Proportional gain; Controls how strongsly the robot reacts to being off target, spring analogy
+  double kI = 0.005; //kI = Integral gain; Fixes small leftovers error
+  double kD = 0.4; //kD = Derivative gain; Smooths things, reacts to how fast error changing
+
+  /*
+    If it doesnt reach target; increase kp
+    If it overshoots/ooschillates; incresae kd
+    if it stops sort, add tiny ki
+  */
+
+  //values to calculate
+  double error = 0;
+  double integral = 0;
+  double derivative = 0;
+  double prevError = 0;
+
+  //reset motor encoder
+  driveleft.setPosition(0, degrees);
+  driveright.setPosition(0, degrees);
+
+
+  while (true) {
+    //measures robot distance
+    double leftPos = driveleftFront.position(degrees);
+    double rightPos = driverightFront.position(degrees);
+    double averagePos = (leftPos + rightPos) / 2.0;
+
+    //calculate values
+    error = targetDegrees - averagePos;
+    integral += error;
+    derivative = error - prevError;
+
+    //calculate power
+    double power = (kP * error) + (kI * integral) + (kD * derivative);
+
+    //cap power to prevent overshoot
+    if (power > 100) power = 100;
+    if (power < -100) power = -100;
+
+    //apply power
+    driveleft.spin(fwd, power, pct);
+    driveright.spin(fwd, power, pct);
+
+    prevError = error;
+
+    //if close to targe(within 5 degres), stop it
+    if (fabs(error) < 5 && fabs(derivative) < 2) {
+      break;
+    }
+
+    wait(20, msec);
+
+    //brake
+    driveleft.stop(brake);
+    driveright.stop(brake);
+  }
+}
+
 
 void autonomous(void) {
   // ..........................................................................
   // add direct measurement because we dont have any sensors
   // ..........................................................................
+  drivePID(1000);
+  drivePID(-1000);
 
+  Brain.Screen.printAt(10, 80, "went forward 1000 degrees and back");
  
 }
 
