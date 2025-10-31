@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       sebkarame                                                 */
+/*    Author:       sixseven                                                  */
 /*    Created:      19/09/2025, 21:20:29                                      */
 /*    Description:  V5 project                                                */
 /*                                                                            */
@@ -25,29 +25,37 @@ motor driveleftBack(PORT2, ratio18_1, false);
 motor driverightFront(PORT9, ratio18_1, true);
 motor driverightBack(PORT10, ratio18_1, true);
 
-//define all intake motors
+//drivetrain motor group
+motor_group driveleft(driveleftFront, driveleftBack);
+motor_group driveright(driverightFront, driverightBack);
+
+//define the intake motors
 motor intakerightFront(PORT8, ratio18_1, false);
 motor intakerightMiddle(PORT7, ratio18_1, false);
 motor intakeleftMiddle(PORT3, ratio18_1, true);
 motor intakeleftBack(PORT4, ratio18_1, true);
 
-// define your global instances of motors and other devices here
+//intake motor group
+motor_group intake(intakerightFront, intakerightMiddle, intakeleftMiddle, intakeleftBack);
 
-/*---------------------------------------------------------------------------*/
-/*                          Pre-Autonomous Functions                         */
-/*                                                                           */
-/*  You may want to perform some actions before the competition starts.      */
-/*  Do them in the following function.  You must return from this function   */
-/*  or the autonomous and usercontrol tasks will not be started.  This       */
-/*  function is only called once after the V5 has been powered on and        */
-/*  define all aspects of the vex bot here 
- */
-/*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
 
   // All activities that occur before the competition starts
   // Example: clearing encoders, setting servo positions, ...
+
+  //reset encoders
+  driveleft.setPosition(0, degrees);
+  driveright.setPosition(0, degrees);
+
+  //reset brake modes
+  driveleft.setStopping(brake);
+  driveright.setStopping(brake);
+  intake.setStopping(hold);
+
+  //print to brain
+  Brain.Screen.printAt(10, 40, 'robot pre-auton complete');
+
 }
 
 /*---------------------------------------------------------------------------*/
@@ -65,14 +73,7 @@ void autonomous(void) {
   // add direct measurement because we dont have any sensors
   // ..........................................................................
 
-  driveleft.setPosition(0, degrees);
-  driveright.setPosition(0, degrees);
-
-  driveleft.setStopping(brake);
-  driverright.setStopping(brake);
-  intake.setStopping(brake);
-
-  Brain.Screen.print(10, 40, 'robot ready')
+ 
 }
 
 /*---------------------------------------------------------------------------*/
