@@ -7,11 +7,17 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
+//admin stuff
+
 #include "vex.h"
 
 
 //makes it easier to do instead of using say vex::Motor
 using namespace vex; 
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+//declare everything
 
 // A global instance of competition
 competition Competition;
@@ -39,11 +45,11 @@ motor intakeleftBack(PORT4, ratio18_1, true);
 //intake motor group
 motor_group intake(intakerightFront, intakerightMiddle, intakeleftMiddle, intakeleftBack);
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+//Pre auton functions
 
 void pre_auton(void) {
-
-  // All activities that occur before the competition starts
-  // Example: clearing encoders, setting servo positions, ...
 
   //reset encoders
   driveleft.setPosition(0, degrees);
@@ -59,7 +65,9 @@ void pre_auton(void) {
 
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
+//PID drive function
 
 void drivePID(double targetDegrees) {
 
@@ -133,7 +141,37 @@ void drivePID(double targetDegrees) {
   }
 }
 
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
+//functions for pid distance conversion in both meters and inches
+
+double meterstodegrees(double distanceM) {
+  double wheeldiameterM = 0.1016; // 4in
+  double wheelcircumferenceM = M_1_PI * wheeldiameterM;
+  return (360.0 * distanceM) / wheelcircumferenceM;
+}
+
+double inchestodegrees(double distanceIn) {
+  double wheeldiameterIn = 4.0;
+  double wheelcircumferenceIn = M_1_PI * wheeldiameterIn;
+  return (360.0 * distanceIn) / wheelcircumferenceIn;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+//function for turning pid for both meters and inches
+
+double turndegreestowheelpidM(double turnangleD, double trackwidthM, double wheeldiameterM = 0.1016) {
+  return (trackwidthM / wheeldiameterM) * turnangleD; 
+}
+
+double turndegreestowheelpidIn(double turnangleD, double trackwidthIn, double wheeldiameterIn = 4.0){
+  return (trackwidthIn / wheeldiameterIn) * turnangleD;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------------------------
+
+//Autonomous function
 
 void autonomous(void) {
   // ..........................................................................
@@ -142,23 +180,20 @@ void autonomous(void) {
   drivePID(1000);
   drivePID(-1000);
 
+  //robot turn right 90 - if left side forward, right backward, it will turn right 
+  double target = turndegreestowheelpidIn(90, 12);
+  driveleft.spinFor(fwd, target, degrees, false);
+  driveright.spinFor(reverse, target, degrees, true);
+
   Brain.Screen.printAt(10, 80, "went forward 1000 degrees and back");
  
 }
 
-/*---------------------------------------------------------------------------*/
-/*                                                                           */
-/*                              User Control Task                            */
-/*                                                                           */
-/*  This task is used to control your robot during the user control phase of */
-/*  a VEX Competition.                                                       */
-/*                                                                           */
-/*  You must modify the code to add your own robot specific commands here.   */
-/*---------------------------------------------------------------------------*/
+//----------------------------------------------------------------------------------------------------------------------------------------------
+
+//User control function
 
 void usercontrol(void) {
-  // User control code here, inside the loop
-
 
   while (true) {
 
@@ -204,7 +239,7 @@ void usercontrol(void) {
   }
 }
 
-
+//--------------------------------------------------------------------------------------------------------------------------------------------
 
 int main() {
   // Set up callbacks for autonomous and driver control periods.
