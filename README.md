@@ -1,9 +1,9 @@
-Empty Competition Template for VEXV5
 
-# Important:
-- Must be ran in VS or a code editor that supports the plugin, otherwise we can't compile it for the brain.
-- Code is put in the src folder
+# This is the code for VEX V5 team 10743C
 
-VexcodeV5 VSCode plugin found here: https://marketplace.visualstudio.com/items?itemName=VEXRobotics.vexcode
 
-test readme update
+To work on the code, you must use the VEX V5 code plugin. You can download it at https://marketplace.visualstudio.com/items?itemName=VEXRobotics.vexcode or use the Visual Studio Code Extension Marketplace. 
+
+This project is coded in C++ and the main code is found under the folder 'src' in the file 'main.cpp'.
+
+
