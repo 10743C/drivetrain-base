@@ -64,6 +64,15 @@ void autonomous(void) {
   // ..........................................................................
   // add direct measurement because we dont have any sensors
   // ..........................................................................
+
+  driveleft.setPosition(0, degrees);
+  driveright.setPosition(0, degrees);
+
+  driveleft.setStopping(brake);
+  driverright.setStopping(brake);
+  intake.setStopping(brake);
+
+  Brain.Screen.print(10, 40, 'robot ready')
 }
 
 /*---------------------------------------------------------------------------*/
