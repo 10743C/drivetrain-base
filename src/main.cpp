@@ -191,9 +191,19 @@ void autonomous(void) {
 
 //----------------------------------------------------------------------------------------------------------------------------------------------
 
-//User control function
-
+//User control function (improved)
 void usercontrol(void) {
+
+  //left power, right power stores current motor speeds
+  int leftPower = 0;
+  int rightPower = 0;
+  double powerchangepercent = 5; //controls how quickly the power changes every loop, make acceleration smoother
+
+  //detects if intake is running, lastl1, lastr1 detect button presses, edge detection
+  bool intakeOn = false;
+  bool lastL1 = false;
+  bool lastR1 = false;
+  //you can now tap l1 once and r1 once to turn on and off for more comfort
 
   while (true) {
 
@@ -201,41 +211,76 @@ void usercontrol(void) {
     int forward = Controller.Axis2.position(pct);
     int turn = Controller.Axis4.position(pct);
 
-    //calculate motor powers
-    int leftPower = forward + turn;
-    int rightPower = forward - turn;
+    //deadband ignores joystick small movements smaller than +- 5%
+    int deadband = 5;
+    if (fabs(forward) < deadband) forward = 0;
+    if (fabs(turn) < deadband) turn = 0;
 
-    //pid stabilisation + antidrift,
-    //checks encoders when going straight, then applies a small correction
+    //applies a exponential curve to joystick input, makes smaller inputs gentler and larger ones full power
+    auto curve = [](int input) {
+      double scaled = pow(fabs(input / 100.0), 1.5) * 100.0;
+      return (input < 0 ? -scaled : scaled);
+    };
+
+    int curvedForward = curve(forward);
+    int curvedTurn = curve(turn);
+    //this curve makes smaller joystick movements more accurate by making it smaller
+
+    //calculate target motor powers
+    int targetLeft = curvedForward + curvedTurn;
+    int targetRight = curvedForward - curvedTurn;
+
+    //smoothly increases or decreasees power to the target instead of jumping instantly
+    if (leftPower < targetLeft)
+      leftPower += powerchangepercent;
+    else if (leftPower > targetLeft)
+      leftPower -= powerchangepercent;
+
+    if (rightPower < targetRight)
+      rightPower += powerchangepercent;
+    else if (rightPower > targetRight)
+      rightPower -= powerchangepercent;
+
+    //dfit to make sure you are driving straigh using pid
     if (fabs(turn) < 5 && fabs(forward) > 10) {
       double error = driveleftFront.position(degrees) - driverightFront.position(degrees);
       double kP = 0.05; //small correction
       double correction = kP * error;
-
       leftPower -= correction;
       rightPower += correction;
-
-    } else {
-      //reset encoders when turning
-      driveleftFront.setPosition(0, degrees);
-      driverightFront.setPosition(0, degrees);
     }
 
-    //apply to drivetrain
-    driveleft.spin(fwd, leftPower, pct);
-    driveright.spin(fwd, rightPower, pct);
+    //when robot is not moving, the brake is applied. When using, the motors coast for smoothness
+    if (fabs(forward) < 5 && fabs(turn) < 5) {
+      driveleft.stop(brake);
+      driveright.stop(brake);
+    } else {
+      driveleft.setStopping(coast);
+      driveright.setStopping(coast);
+      driveleft.spin(fwd, leftPower, pct);
+      driveright.spin(fwd, rightPower, pct);
+    }
 
-    //intake control from l1, r1
-    if (Controller.ButtonL1.pressing()) {
+    //When l1 is pressed, it turns intake on, when r1 is pressed, it turns it off so you dong have to hold the buttons anymore
+    bool L1 = Controller.ButtonL1.pressing();
+    bool R1 = Controller.ButtonR1.pressing();
+
+    if (L1 && !lastL1) { // toggle intake on
+      intakeOn = true;
+    }
+    if (R1 && !lastR1) { // toggle intake off
+      intakeOn = false;
+    }
+    lastL1 = L1;
+    lastR1 = R1;
+
+    if (intakeOn) {
       intake.spin(fwd, 100, pct);
-    } else if (Controller.ButtonR1.pressing()) {
-      intake.spin(reverse, 100, pct);
     } else {
       intake.stop();
     }
 
-    wait(20, msec); // Sleep the task for a short amount of time to
-                    // prevent wasted resources.
+    wait(20, msec); // small delay for loop stability
   }
 }
 
